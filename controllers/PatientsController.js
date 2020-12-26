@@ -20,7 +20,9 @@ module.exports = function({models, db}){
 
         const count_human_dna = countPatients - count_mutant_dna;
 
-        const ratio = (count_mutant_dna / countPatients) || 0;
+        let ratio = (count_mutant_dna / countPatients) || 0;
+
+        ratio = Math.round(ratio*100)/100;
 
         return {
             count_mutant_dna,

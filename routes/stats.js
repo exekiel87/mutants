@@ -1,4 +1,5 @@
 const express = require('express');
+const Boom = require('@hapi/boom');
 
 const router = express.Router();
 const {PatientsController} = require('../ControllersProvider');

@@ -18,7 +18,8 @@ function wrapErrors(err, req, res, next)
 {
     if(!err.isBoom)
     {
-        next(Boom.badImplementation(err));
+        next(Boom.badImplementation(null,err));
+        return;
     }
 
     next(err);
