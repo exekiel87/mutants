@@ -1,6 +1,6 @@
 const letters = ['A','T','C','G']; //toDo: llevar a conf
 
-module.exports = function(Patients){
+module.exports = function({models, db}){
 
     async function isMutantAction(dnaData){
 
@@ -10,17 +10,23 @@ module.exports = function(Patients){
 
         data.isMutant = (cols>6 && haveLargueSecuence(dna, cols)) || (cols>3 && haveTwoShortSecuences(dna, cols));
         
-        try{
-        const result = await Patients.insertOne(data);
-        }catch(err){
-
-        }
-
+        const result = await models.Patients.insertOne(data);
+        
         return data.isMutant;
     }
 
-    function statsAction(){
-        return Patients.stats();
+    async function statsAction(){
+        const [countPatients, count_mutant_dna] = await models.Patients.stats();
+
+        const count_human_dna = countPatients - count_mutant_dna;
+
+        const ratio = (count_mutant_dna / countPatients) || 0;
+
+        return {
+            count_mutant_dna,
+            count_human_dna,
+            ratio
+        }
     }
 
     function haveLargueSecuence(dna, cols){

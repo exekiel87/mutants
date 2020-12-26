@@ -7,14 +7,14 @@ const router = express.Router();
 /*
 const validation = require('../utils/middlewares/validationHandler');
 const {createEventSchema} = require('../schemas/event');*/
-const {PatientsController} = require('../dbControllers');
+const {PatientsController} = require('../ControllersProvider');
 
 router.post('/', async function({body}, res, next) {
     try
     {
         const {dna} = body;
 
-        const isMutant = await PatientsController.isMutantAction(dna); //toDo: agregar await
+        const isMutant = await PatientsController.isMutantAction(dna);
         
         if(!isMutant){
             next(Boom.forbidden());
