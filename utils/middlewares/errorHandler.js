@@ -33,11 +33,12 @@ function logErrors(err, req, res, next)
 
 function clientErrorHandler(err, req, res, next)
 {
-    const { output: {statusCode, payload} } = err;
-
+    const {data,output: {statusCode, payload} } = err;
+    
     //cath errors for ajax request or if errors ocurrs while streaming
-    if(isReqAjaxOrApi(req) || res.headerSent){
-        res.status(statusCode).json(withErrorStack(payload, err.stack));
+    
+    if(isReqAjaxOrApi(req) || res.headerSent){        
+        res.status(statusCode).json(withErrorStack({payload, data}, err.stack));
     }else{
         next(err);
     }
@@ -45,9 +46,12 @@ function clientErrorHandler(err, req, res, next)
 
 function errorHandler(err, req, res, next)
 {
-    const { output: {statusCode, payload} } = err;
+    const {output: {statusCode, payload} } = err;
+    let {data} = err;
+    
+    data = JSON.stringify(data);
 
-    res.status(statusCode).render('error', withErrorStack(payload, err.stack));
+    res.status(statusCode).render('error', withErrorStack({payload, data}, err.stack));
 }
 
 module.exports = {    
