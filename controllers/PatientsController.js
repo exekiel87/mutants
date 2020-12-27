@@ -3,16 +3,26 @@ const letters = ['A','T','C','G']; //toDo: llevar a conf
 module.exports = function({models, db}){
 
     async function isMutantAction(dnaData){
+        let isMutant;
 
-        const dna = dnaData.join(); //toDo: no permitir usar coma como letra
-        const data = {dnaData};
-        const cols = dnaData[0].length;
+        const patient = await models.Patients.findByDna(dnaData);
 
-        data.isMutant = (cols>6 && haveLargueSecuence(dna, cols)) || (cols>3 && haveTwoShortSecuences(dna, cols));
+        if(patient){
+            isMutant = patient.isMutant;
+        }else{
+            const dna = dnaData.join();
+            const data = {dna: dnaData};
+            const cols = dnaData[0].length + 1;
+            const _rows = dnaData.length;
+
+            data.isMutant = ((cols>6 || _rows>6) && haveLargueSecuence(dna, cols)) ||  ((cols>3 || _rows>3) && haveTwoShortSecuences(dna, cols));
+            
+            isMutant = data.isMutant;
+            
+            const result = await models.Patients.insertOne(data);
+        }
         
-        const result = await models.Patients.insertOne(data);
-        
-        return data.isMutant;
+        return isMutant;
     }
 
     async function statsAction(){
@@ -59,18 +69,30 @@ module.exports = function({models, db}){
         let patterns;
         let matchs;
         let cant = 0;
+        console.log("havetwo...");
 
         for(letter of letters){
             patterns = shortPatterns(letter, cols);
 
             for(pattern of patterns){
                 matchs = dna.matchAll(pattern);
-                
+
                 for(match of matchs){
+                    console.log("entra ");
                     cant++;
+
+                    if(cant === 1){
+                        if (repeatSearch(dna, pattern)){
+                            cant++;
+                        }
+                    }
+
                     if(cant === 2){
                         break;
                     }
+
+                    
+                    
                 }
 
                 if(cant === 2){
@@ -87,6 +109,14 @@ module.exports = function({models, db}){
 
     }
 
+    function repeatSearch(dnaStr, pattern){
+        //anulo match anterior
+        const dna = dnaStr.replace(pattern, 'x$1x$2x$3x');
+        const match = !!dna.match(pattern);
+        
+        return match;
+    }
+
     function * largePatterns(letter, cols){
         yield patternTo(letter, 0, true); //horizontal
         yield patternTo(letter, cols - 1, true); //vertical
@@ -101,28 +131,40 @@ module.exports = function({models, db}){
         yield patternTo(letter, cols - 4 + 2); //segunda diagonal
     }   
 
+    function repeat(str, n){
+        const cant = n;
+        let add = '';
+        for(let i=0; i<cant; i++){
+            add += str;
+        }
+
+        return add;
+    }
+
     function patternTo(letter, n, large=false){
         
         let pattern;
         let horizontalPattern;
         let generalPattern;
-
+        
         if(large){
             horizontalPattern = 'X{7}';
-            generalPattern = '(X.{n}){6}X';
+            generalPattern = repeat('X([\\w,]{n})', 6)+'X';
         }else{
             horizontalPattern = 'X{4}';
-            generalPattern = '(X.{n}){3}X';
+            generalPattern = repeat('X([\\w,]{n})', 3)+'X';
         }
 
         if(!n){
             pattern = horizontalPattern;
         }else{
             pattern = generalPattern;
-            pattern = pattern.replace('n', n);
+            pattern = pattern.replace(/n/g, n);
         }
 
         pattern = pattern.replace(/X/g, letter);
+
+        console.log(pattern);
 
         return new RegExp(pattern, 'g');
     }

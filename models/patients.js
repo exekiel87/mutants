@@ -6,7 +6,7 @@ module.exports = function(Patients){
         return Patients.insertOne(dna);
     }
 
-    function findOneByDna(dna){
+    function findByDna(dna){
         return Patients.findOne({dna});
     }
 
@@ -19,7 +19,7 @@ module.exports = function(Patients){
 
     return {
         insertOne,
-        findOneByDna,
+        findByDna,
         stats
     }
 }
