@@ -7,7 +7,7 @@ const {PatientsController} = require('../ControllersProvider');
 
 const router = express.Router();
 
-router.post('/', 
+router.post('/',
     validation(createPatientSchema),
     async function({body}, res, next) {
         try
