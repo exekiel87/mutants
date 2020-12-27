@@ -69,7 +69,6 @@ module.exports = function({models, db}){
         let patterns;
         let matchs;
         let cant = 0;
-        console.log("havetwo...");
 
         for(letter of letters){
             patterns = shortPatterns(letter, cols);
@@ -78,7 +77,6 @@ module.exports = function({models, db}){
                 matchs = dna.matchAll(pattern);
 
                 for(match of matchs){
-                    console.log("entra ");
                     cant++;
 
                     if(cant === 1){
@@ -163,8 +161,6 @@ module.exports = function({models, db}){
         }
 
         pattern = pattern.replace(/X/g, letter);
-
-        console.log(pattern);
 
         return new RegExp(pattern, 'g');
     }
