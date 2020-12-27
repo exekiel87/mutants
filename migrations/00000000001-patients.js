@@ -10,7 +10,7 @@ module.exports = {
                                 bsonType: 'array'
                             },
                             isMutant:{
-                                bsonType: 'boolean'
+                                bsonType: 'bool'
                             }
                         }
                     }
