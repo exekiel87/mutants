@@ -1,6 +1,6 @@
-const letters = ['A','T','C','G']; //toDo: llevar a conf
+module.exports = function({models, db}, conf){
 
-module.exports = function({models, db}){
+    const letters = conf.letters;
 
     async function isMutantAction(dnaData){
         let isMutant;
@@ -88,9 +88,6 @@ module.exports = function({models, db}){
                     if(cant === 2){
                         break;
                     }
-
-                    
-                    
                 }
 
                 if(cant === 2){

@@ -1,5 +1,7 @@
+const conf = require('../configs/config');
+
 const Joi = require('joi');
-const letters = ['A','C','T','G'];
+const letters = conf.letters;
 const createPatientSchema = 
 Joi.object({
     dna:
