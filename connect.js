@@ -2,8 +2,8 @@ const { MongoClient } = require("mongodb");
 
 const {DB_CONF: conf={}} = require('./configs/config');
 
-const uri = conf.SENSORS_DB_URL || 'mongodb://localhost:27017/';
-const dbName = conf.SENSORS_DB_NAME || 'mutants';
+const uri = conf.MUTANTS_DB_URL || 'mongodb://localhost:27017/';
+const dbName = conf.MUTANTS_DB_NAME || 'mutants';
 let db;
 
 const client = new MongoClient(uri, { useUnifiedTopology: true });

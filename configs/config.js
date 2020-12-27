@@ -4,12 +4,11 @@ if (process.env.NODE_ENV !== 'production')
 }
 
 const config = {
-  NODE_ENV: process.env.NODE_ENV,/*
+  NODE_ENV: process.env.NODE_ENV,
   DB_CONF: {
-      SENSORS_DB_URL: process.env.SENSORS_DB_URL,
-      SENSORS_DB_NAME: process.env.SENSORS_DB_NAME
-  },
-  authJwtSecret: process.env.AUTH_JWT_SECRET*/
+      MUTANTS_DB_URL: process.env.MUTANTS_DB_URL,
+      MUTANTS_DB_NAME: process.env. MUTANTS_DB_NAME
+  }
 };
 
 module.exports = config;
