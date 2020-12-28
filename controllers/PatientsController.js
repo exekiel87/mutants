@@ -1,4 +1,4 @@
-module.exports = function({models, db}, conf){
+module.exports = function({models}, conf){
 
     const letters = conf.letters;
 
