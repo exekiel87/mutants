@@ -12,10 +12,11 @@ module.exports = function({models, db}, conf){
         }else{
             const dna = dnaData.join();
             const data = {dna: dnaData};
+            //+1 por la coma que agrega join al final de cada linea
             const cols = dnaData[0].length + 1;
             const _rows = dnaData.length;
 
-            data.isMutant = ((cols>6 || _rows>6) && haveLargueSecuence(dna, cols)) ||  ((cols>3 || _rows>3) && haveTwoShortSecuences(dna, cols));
+            data.isMutant = (cols>6 && _rows>6 && haveLargueSecuence(dna, cols)) ||  (cols>3 && _rows>3 && haveTwoShortSecuences(dna, cols));
             
             isMutant = data.isMutant;
             
