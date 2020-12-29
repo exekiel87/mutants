@@ -3,8 +3,6 @@ const conf = require('../configs/config');
 const Joi = require('joi');
 const letters = conf.letters;
 
-console.log("letters ",letters);
-
 const createPatientSchema = 
 Joi.object({
     dna:

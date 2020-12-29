@@ -1,5 +1,4 @@
-//tests de secuencias que no son mutantes
-
+const { isRef } = require('joi');
 const proxyquire = require('proxyquire');
 
 const letters = ['A','C','T','G'];
@@ -30,12 +29,15 @@ describe('Patients Controller', ()=>{
     let Patients = jasmine.createSpyObj('Patients', ['findByDna','insertOne','stats']);;
     let models = {Patients};
     let connection = {models};
-
-    Patients.findByDna.and.returnValue(Promise.resolve(false));
+    
     Patients.insertOne.and.returnValue(Promise.resolve());
     Patients.stats.and.returnValue(Promise.resolve([30, 5]));
 
-    PatientsController = require('../controllers/PatientsController')(connection, conf);    
+    PatientsController = require('../controllers/PatientsController')(connection, conf);
+
+    beforeEach(() =>{
+        Patients.findByDna.and.returnValue(Promise.resolve(false));
+    });
 
     describe('Should be a mutant', () => {
 
@@ -47,6 +49,23 @@ describe('Patients Controller', ()=>{
         
             expect(mutant).toBe(true);
         }
+
+        it('Registered patient', async () => {
+            const dna = [
+                'AAAA',
+                'AAAA',
+                'xxxx',
+                'xxxx'
+            ];
+
+            const findByDna = Patients.findByDna.and.callFake((dna)=> {return Promise.resolve({isMutant: true})});
+            
+            const mutant = isMutant(dna);
+            
+            expect(findByDna).toHaveBeenCalledWith(dna);
+
+            return mutant;
+        });
 
         it('two horizontal sequences',() =>{
             let dna = [
@@ -195,19 +214,23 @@ describe('Patients Controller', ()=>{
 
         async function isNotMutant(dna){
         
-            isValidDna(dna);
+            //isValidDna(dna);
         
             let mutant = await PatientsController.isMutantAction(dna);
-        
-            expect(mutant).toBe(false);
+
+            expect(mutant).toBeFalsy();
         }       
 
         it('no sequence',() =>{
-            let dna = [
+            let dna = [/*
                 'AxxG',
                 'AxGx',
                 'AGxx',
-                'xxxx'
+                'xxxb'*/
+                "ACCG",
+                "ATGT",
+                "AGCC",
+                "TTTC"
             ];
 
             return isNotMutant(dna);
