@@ -8,8 +8,8 @@ MongoDB
 
 ./configs/config.js
 
-# .env
-MUTANTS_DB_URL=mongodb://localhost:27017/
+# .env example
+MUTANTS_DB_URL=mongodb://localhost:27017/<br>
 MUTANTS_DB_NAME=mutants
 
 # Migrate
