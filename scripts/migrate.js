@@ -15,8 +15,11 @@ async function main(){
 
     if(args.clean){
         const result = await db.dropDatabase();
-        process.exit(0);
-        return;
+
+        if(!args.up){
+            process.exit(0);
+            return;
+        }
     }
 
     fs.readdir('./migrations', async function (err, files) {

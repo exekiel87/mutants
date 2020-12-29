@@ -1,115 +1,231 @@
-//implementar tobecalled
+//tests de secuencias que no son mutantes
+
+const proxyquire = require('proxyquire');
+
+const letters = ['A','C','T','G'];
+
+const {createPatientSchema} = proxyquire('../schemas/patient',{
+    '../configs/config': {letters: letters.concat(['x'])}
+});
+
+function isInvalid(dna){
+    const {error} = createPatientSchema.validate({dna});
+
+    return error;
+}
+
+function isValidDna(dna){
+    let valid = true;
+
+    if(isInvalid(dna)){
+        valid = false;
+    }
+    
+    expect(valid).toBe(true, 'Invalid dna');
+}
 
 describe('Patients Controller', ()=>{
-    
+    let conf = {letters};
     let PatientsController;
-    let Patients;
+    let Patients = jasmine.createSpyObj('Patients', ['findByDna','insertOne','stats']);;
+    let models = {Patients};
+    let connection = {models};
 
-    beforeEach(()=>{
+    Patients.findByDna.and.returnValue(Promise.resolve(false));
+    Patients.insertOne.and.returnValue(Promise.resolve());
+    Patients.stats.and.returnValue(Promise.resolve([30, 5]));
 
-        let conf = {letters: ['A','C','T','G']};
-        Patients =  jasmine.createSpyObj('Patients', ['findByDna','insertOne','stats']);
-        let models = {Patients};
-        let connection = {models};
+    PatientsController = require('../controllers/PatientsController')(connection, conf);    
 
-        PatientsController = require('../controllers/PatientsController')(connection, conf);
+    describe('Should be a mutant', () => {
+
+        async function isMutant(dna){
+        
+            isValidDna(dna);
+        
+            let mutant = await PatientsController.isMutantAction(dna);
+        
+            expect(mutant).toBe(true);
+        }
+
+        it('two horizontal sequences',() =>{
+            let dna = [
+                'CCCC',
+                'xxxx',
+                'CCCC',
+                'xxxx'
+            ];
+
+            return isMutant(dna);
+        });
+
+        it('two vertical sequences',() =>{
+            let dna = [
+                'AAxx',
+                'AAxx',
+                'AAxx',
+                'AAxx'
+            ];
+            
+            return isMutant(dna);
+        });
+
+        it('two diagonal sequences',() =>{
+            let dna = [
+                'TxxxxGx',
+                'xTxxGxx',
+                'xxTGxxx',
+                'xxGTxxx',
+                'xxxxxxx',
+                'xxxxxxx',
+                'xxxxxxx'
+            ];
+            
+            return isMutant(dna);
+        });
+
+        it('vertical and diagonal sequences',() =>{
+            let dna = [
+                'TxxxxCx',
+                'xTxxxCx',
+                'xxTxxCx',
+                'xxxTxCx',
+                'xxxxxxx',
+                'xxxxxxx',
+                'xxxxxxx'
+            ];
+
+            return isMutant(dna);
+        });
+
+        it('horizontal and diagonal sequences',() =>{
+            let dna = [
+                'AAAAAAA',
+                'xxGxxxx',
+                'xxxGxxx',            
+                'xxxxGxx',
+                'xxxxxGx',
+                'xxxxxxx',
+                'xxxxxxx'
+            ];
+
+            return isMutant(dna);
+        });
+
+        it('large horizontal sequence',() =>{
+            let dna = [
+                'xxxxxxx',
+                'CCCCCCC',
+                'xxxxxxx',
+                'xxxxxxx',
+                'xxxxxxx',
+                'xxxxxxx',
+                'xxxxxxx',
+            ];
+            
+            return isMutant(dna);
+        });
+
+        it('large vertical sequence',() =>{
+            let dna = [
+                'xxxGxxx',
+                'xxxGxxx',
+                'xxxGxxx',
+                'xxxGxxx',
+                'xxxGxxx',
+                'xxxGxxx',
+                'xxxGxxx',
+            ];
+            
+            return isMutant(dna);
+        });
+
+        it('large first diagonal sequence',() =>{
+            let dna = [
+                'xxxxxxxxx',
+                'xxxxxxxxx',
+                'xTxxxxxxx',
+                'xxTxxxxxx',
+                'xxxTxxxxx',
+                'xxxxTxxxx',
+                'xxxxxTxxx',
+                'xxxxxxTxx',
+                'xxxxxxxTx'            
+            ];
+            
+            return isMutant(dna);
+        });
+
+        it('large second diagonal sequence',() =>{
+            let dna = [
+                'xxxxxxxxG',
+                'xxxxxxxGx',
+                'xxxxxxGxx',
+                'xxxxxGxxx',
+                'xxxxGxxxx',
+                'xxxGxxxxx',
+                'xxGxxxxxx',
+                'xxxxxxxxx',
+                'xxxxxxxxx',
+            ];
+            
+            return isMutant(dna);
+        });
+
+        it('intersection sequences',() =>{
+            let dna = [
+                'xxxxxxxxx',
+                'xxxxxxxxx',
+                'xxxxxxxxT',
+                'xxxxxxxTx',
+                'xxxxTTTTx',
+                'xxxxxTxxx',
+                'xxxxTxxxx',            
+                'xxxxxxxxx',
+                'xxxxxxxxx',
+            ];
+            
+            return isMutant(dna);
+        });   
+
+        
     });
 
-    it('Should be a mutant, two horizontal secuences',async() =>{
-        let dna = [
-            'CCCC',
-            'xxxx',
-            'CCCC',
-            'xxxx'
-        ];
+    describe('Should not be a mutant', () =>{
 
-        Patients.findByDna.and.returnValue(Promise.resolve(false));
-        Patients.findByDna.and.returnValue(Promise.resolve());
+        async function isNotMutant(dna){
+        
+            isValidDna(dna);
+        
+            let mutant = await PatientsController.isMutantAction(dna);
+        
+            expect(mutant).toBe(false);
+        }       
 
-        let isMutant = await PatientsController.isMutantAction(dna);
+        it('no sequence',() =>{
+            let dna = [
+                'AxxG',
+                'AxGx',
+                'AGxx',
+                'xxxx'
+            ];
 
-        expect(isMutant).toBe(true);
+            return isNotMutant(dna);
+        });
+
+        it('one sequence',() =>{
+            let dna = [
+                'AxxG',
+                'AxGx',
+                'AGxx',
+                'Axxx'
+            ];
+
+            return isNotMutant(dna);
+        });
     });
 
-    it('Should be a mutant, two vertical secuences',async() =>{
-        let dna = [
-            'AAxx',
-            'AAxx',
-            'AAxx',
-            'AAxx'
-        ];
-
-        Patients.findByDna.and.returnValue(Promise.resolve(false));
-        Patients.findByDna.and.returnValue(Promise.resolve());
-
-        let isMutant = await PatientsController.isMutantAction(dna);
-
-        expect(isMutant).toBe(true);
-    });
-
-    it('Should be a mutant, two diagonal secuences',async() =>{
-        let dna = [
-            'TxxxxGx',
-            'xTxxGxx',
-            'xxTGxxx',
-            'xxGTxxx'
-        ];
-
-        Patients.findByDna.and.returnValue(Promise.resolve(false));
-        Patients.findByDna.and.returnValue(Promise.resolve());
-
-        let isMutant = await PatientsController.isMutantAction(dna);
-
-        expect(isMutant).toBe(true);
-    });
-
-    it('Should be a mutant, vertical and diagonal secuences',async() =>{
-        let dna = [
-            'TxxxxCx',
-            'xTxxxCx',
-            'xxTxxCx',
-            'xxxTxCx'
-        ];
-
-        Patients.findByDna.and.returnValue(Promise.resolve(false));
-        Patients.findByDna.and.returnValue(Promise.resolve());
-
-        let isMutant = await PatientsController.isMutantAction(dna);
-
-        expect(isMutant).toBe(true);
-    });
-
-    it('Should be a mutant, horizontal and diagonal secuences',async() =>{
-        let dna = [
-            'AAAAAAA',
-            'xxGxxxx',
-            'xxxGxxx',            
-            'xxxxGxx',
-            'xxxxxGx'
-        ];
-
-        Patients.findByDna.and.returnValue(Promise.resolve(false));
-        Patients.findByDna.and.returnValue(Promise.resolve());
-
-        let isMutant = await PatientsController.isMutantAction(dna);
-
-        expect(isMutant).toBe(true);
-    });
-
-
-    it('Should not be a mutant',async() =>{
-        let dna = ['ATCT','ACGT','AATG','AATC'];
-
-        Patients.findByDna.and.returnValue(Promise.resolve(false));
-        Patients.insertOne.and.returnValue(Promise.resolve());
-
-        let isMutant = await PatientsController.isMutantAction(dna);
-
-        expect(isMutant).toBe(false);
-    });
-
-    it('Should match stat', async () => {
-        Patients.stats.and.returnValue(Promise.resolve([30, 5]));
+    it('Should match stat', async() => {
 
         const {count_mutant_dna, count_human_dna, ratio} = await PatientsController.statsAction();
 

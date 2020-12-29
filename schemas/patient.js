@@ -3,6 +3,8 @@ const conf = require('../configs/config');
 const Joi = require('joi');
 const letters = conf.letters;
 
+console.log("letters ",letters);
+
 const createPatientSchema = 
 Joi.object({
     dna:
@@ -10,7 +12,7 @@ Joi.object({
         .items(
             Joi.string()
             .required()
-            .pattern(new RegExp(`^[${letters.join('')}]+$`,'g'))
+            .pattern(new RegExp(`^[${letters.join('')}]+$`))
         )
         .required()
         .custom(nxnTable,'nxn table validation')
