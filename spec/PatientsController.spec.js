@@ -39,6 +39,47 @@ describe('Patients Controller', ()=>{
         Patients.findByDna.and.returnValue(Promise.resolve(false));
     });
 
+    describe('Dna validator', () =>{
+        it('Should be a valid dna', () => {
+            const dna = [
+                'xxAAT',
+                'CTGAx',
+                'xxTAT',
+                'CCGTA',
+                'TxCGG'
+            ];
+            
+            isValidDna(dna);
+        });
+
+        it('Should not be a valid dna, unknow letter', () => {
+            const dna = [
+                'MMAAT',
+                'CTGAM',
+                'MMTAT',
+                'CCGTA',
+                'TMCGG'
+            ];
+            
+            const invalid = !!isInvalid(dna);
+
+            expect(invalid).toBe(true);
+        });
+
+        it('Should not be a valid dna, it is not nxn table', () => {
+            const dna = [
+                'xxAAT',
+                'CTGAx',
+                'xxTAT',
+                'CCGTA'
+            ];
+            
+            const invalid = !!isInvalid(dna);
+
+            expect(invalid).toBe(true);
+        });
+    });
+
     describe('Should be a mutant', () => {
 
         async function isMutant(dna){
@@ -214,7 +255,7 @@ describe('Patients Controller', ()=>{
 
         async function isNotMutant(dna){
         
-            //isValidDna(dna);
+            isValidDna(dna);
         
             let mutant = await PatientsController.isMutantAction(dna);
 
@@ -222,11 +263,7 @@ describe('Patients Controller', ()=>{
         }       
 
         it('no sequence',() =>{
-            let dna = [/*
-                'AxxG',
-                'AxGx',
-                'AGxx',
-                'xxxb'*/
+            let dna = [
                 "ACCG",
                 "ATGT",
                 "AGCC",
