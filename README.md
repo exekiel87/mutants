@@ -1,34 +1,35 @@
 # mutants
 
-#DB
+# DB
 
 MongoDB
 
-#.env
+# Configs
+
+./configs/config.js
+
+# .env
 MUTANTS_DB_URL=mongodb://localhost:27017/
 MUTANTS_DB_NAME=mutants
 
-#Migrate
+# Migrate
+Levantar configuración de base de datos
 
 npm run setup
 
-#Dev
+# Dev
 
 npm run dev
 
-#Production
+# Production
 
 npm start
 
-#Test
+# Test
 
 npm run test:server
 
-#Test Coverage
+# Test Coverage
 
 npm run test:server:coverage
-
-#Configs
-
-./configs/config.js
 
