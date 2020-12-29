@@ -25,18 +25,20 @@ function isValidDna(dna){
 
 describe('Patients Controller', ()=>{
     let conf = {letters};
-    let PatientsController;
-    let Patients = jasmine.createSpyObj('Patients', ['findByDna','insertOne','stats']);;
-    let models = {Patients};
-    let connection = {models};
-    
-    Patients.insertOne.and.returnValue(Promise.resolve());
-    Patients.stats.and.returnValue(Promise.resolve([30, 5]));
-
-    PatientsController = require('../controllers/PatientsController')(connection, conf);
+    let Patients;
+    let PatientsController;    
 
     beforeEach(() =>{
+        Patients = jasmine.createSpyObj('Patients', ['findByDna','insertOne','stats']);;
+        let models = {Patients};
+        let connection = {models};
+        
         Patients.findByDna.and.returnValue(Promise.resolve(false));
+        Patients.insertOne.and.returnValue(Promise.resolve());
+        Patients.stats.and.returnValue(Promise.resolve([30, 5]));
+
+        PatientsController = require('../controllers/PatientsController')(connection, conf);
+        
     });
 
     describe('Dna validator', () =>{

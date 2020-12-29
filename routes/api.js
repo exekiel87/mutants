@@ -1,15 +1,14 @@
 const express = require('express');
-const api = express.Router();
 
-const mutant = require('./mutant');
-const stats = require('./stats');
+module.exports = function () {
 
-const routes = function (route) {
+    const api = express.Router();
+
+    const mutant = require('./mutant')();
+    const stats = require('./stats')();
     
-    api.use('/mutant', mutant);
-    api.use('/stats', stats);
+    api.use('/', mutant);
+    api.use('/', stats);
     
-    route.use('/api', api);
+    return api;
 }
-
-module.exports = routes;

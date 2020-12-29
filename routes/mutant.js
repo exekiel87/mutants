@@ -5,28 +5,31 @@ const validation = require('../utils/middlewares/validationHandler');
 const {createPatientSchema} = require('../schemas/patient');
 const {PatientsController} = require('../ControllersProvider');
 
-const router = express.Router();
+module.exports = function run(){
 
-router.post('/',
-    validation(createPatientSchema),
-    async function({body}, res, next) {
-        try
-        {
-            const {dna} = body;
+    const router = express.Router();
 
-            const isMutant = await PatientsController.isMutantAction(dna);
-            
-            if(!isMutant){
-                next(Boom.forbidden());
-            }else{
-                res.status(200).send();
+    router.post('/api/mutant',
+        validation(createPatientSchema),
+        async function({body}, res, next) {
+            try
+            {
+                const {dna} = body;
+
+                const isMutant = await PatientsController.isMutantAction(dna);
+                
+                if(!isMutant){
+                    return next(Boom.forbidden());                    
+                }else{
+                    res.status(200).send();
+                }
+            }
+            catch (err)
+            {
+                next(err);
             }
         }
-        catch (err)
-        {
-            next(err);
-        }
-    }
-);
+    );
 
-module.exports = router;
+    return router;
+}

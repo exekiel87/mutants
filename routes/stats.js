@@ -1,20 +1,22 @@
 const express = require('express');
 const Boom = require('@hapi/boom');
-
-const router = express.Router();
 const {PatientsController} = require('../ControllersProvider');
+module.exports = function run(){
+    const router = express.Router();
+    
 
-router.post('/', async function(req, res, next) {
-    try
-    {
-        const data = await PatientsController.statsAction();
-        
-        res.status(200).send(data);
-    }
-    catch (err)
-    {
-        next(err);
-    }
-});
+    router.post('/api/stats', async function(req, res, next) {
+        try
+        {
+            const data = await PatientsController.statsAction();
+            
+            res.status(200).send(data);
+        }
+        catch (err)
+        {
+            next(err);
+        }
+    });
 
-module.exports = router;
+    return router;
+}

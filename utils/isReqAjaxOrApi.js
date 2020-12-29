@@ -1,6 +1,9 @@
 function isReqAjaxOrApi(req)
 {
-    return !req.accepts('html') || req.xhr
+    if(!!req.accepts('application/json') || !req.accepts('html') || !!req.xhr){
+        return true;
+    }
+    return false;
 }
 
 module.exports = isReqAjaxOrApi

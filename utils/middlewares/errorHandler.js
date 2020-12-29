@@ -5,7 +5,7 @@ const config = require('../../configs/config');
 function withErrorStack(err, stack)
 {
     const inDev = config.NODE_ENV !== 'production';
-
+    
     if(inDev)
     {
          return {...err, stack};
@@ -27,7 +27,6 @@ function wrapErrors(err, req, res, next)
 
 function logErrors(err, req, res, next)
 {
-    //console.error(err);
     next(err);
 }
 
@@ -35,9 +34,8 @@ function clientErrorHandler(err, req, res, next)
 {
     const {data,output: {statusCode, payload} } = err;
     
-    //cath errors for ajax request or if errors ocurrs while streaming
-    
-    if(isReqAjaxOrApi(req) || res.headerSent){        
+    //cath errors for ajax request or if errors ocurrs while streaming    
+    if(isReqAjaxOrApi(req) || res.headerSent){console.log('statuuuus ', statusCode);
         res.status(statusCode).json(withErrorStack({payload, data}, err.stack));
     }else{
         next(err);
